@@ -1,0 +1,9 @@
+accessKey: minio_access_key
+secret: minio_secret_key
+bucket: hasura-backend-plus
+port: 9000
+replicaCount: 1
+
+volume:
+  storage:
+    size: "1Gi"

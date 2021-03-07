@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio
+  labels:
+    app: myapplication
+    tier: minio
+spec:
+  serviceName: "minio"
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: myapplication
+      tier: minio
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: myapplication
+        tier: minio
+    spec:
+      containers:
+        - name: minio
+          image: minio/minio:latest
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: minio-config
+          ports:
+            - containerPort: {{ .Values.port }}
+          volumeMounts:
+            - name: minio-dev
+              mountPath: /data
+          command: ["/bin/sh"]
+          args:
+            [
+              "-c",
+              "mkdir -p /export/hasura-backend-plus && /usr/bin/minio server /export",
+            ]
+  volumeClaimTemplates:
+    - metadata:
+        name: minio-dev
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ .Values.volume.storage.size }}
+
